@@ -6,10 +6,10 @@ ClassifierSavePath=./Classifier/res/${Dataset}_vgg
 # ClassifierSavePath=./Classifier/res/${Dataset}_resnet50
 SegmenterSavePath=./Segmenter/res/${Dataset}_vgg
 
-# #### Step 0: Data Preprocessing (Once finished, you can comment this part)
-# python ./Preprocess/DeepGlobe/preprocess.py \
-#     --DirImage ${DataPath}/land-train \
-#     --SavePath ${DataSavePath}
+#### Step 0: Data Preprocessing (Once finished, you can comment this part)
+python ./Preprocess/DeepGlobe/preprocess.py \
+    --DirImage ${DataPath}/land-train \
+    --SavePath ${DataSavePath}
 
 #### Step 1: Train Classifier (Backbone: VGG)
 CUDA_VISIBLE_DEVICES=4,5,6,7 python -m torch.distributed.launch --nnodes=1 --nproc_per_node=4 --master_port 54321 ./Classifier/scripts/train.py \
