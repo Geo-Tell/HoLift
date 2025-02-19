@@ -52,6 +52,8 @@ def parse_args():
                         help='warmup epoch')
     parse.add_argument('--WUStartLr',default=3e-7,type=float,
                         help='learning rate of warmup')
+    parse.add_argument("--DispInterval", type=int, default=100, 
+                        help='Iteration number of displaying training log')
     parse.add_argument(
             '--local_rank',
             dest = 'local_rank',
@@ -215,7 +217,7 @@ def train(verbose=True, **kwargs):
                                 args.WUStartLr,
                                 args.WUEpoch*epoch_iters)
             loss_avg.append(loss.item())
-            if i_iter % 1 == 0:
+            if i_iter % args.DispInterval == 0:
                 ed = time.time()
                 msg = 'Epoch: [{}/{}] Iter:[{}/{}], Time: {:.2f}, ' \
                     'lr: {:.6f}, Loss: {:.6f}' .format(

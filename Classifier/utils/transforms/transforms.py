@@ -173,7 +173,7 @@ class RandomResize(object):
             PIL Image: Rescaled image.
         """
         #return F.resize(img, self.size, self.interpolation)
-        return F.resize(img, (self.size, self.size), self.interpolation)
+        return TF.resize(img, (self.size, self.size), self.interpolation)
 
 class RandomResizeRange(object):
     """Resize the input PIL Image to the given size.

@@ -37,13 +37,13 @@ def DeepGlobe_Train(args):
                     transforms.Normalize(mean_vals, std_vals),
                 ])
     tsfm_more = [transforms.Compose([
+                    transforms.ToTensor(),
                     transforms.RandomResize([int(0.75*input_size), int(input_size), 
                                             int(1.25*input_size), int(1.5*input_size), 
                                             int(2*input_size)]),  
                     transforms_pytorch.RandomHorizontalFlip(0.5),
                     transforms_pytorch.RandomVerticalFlip(0.5),
                     transforms_pytorch.RandomRotation(0,90),
-                    transforms.ToTensor(),
                     transforms.Normalize(mean_vals, std_vals),
                 ])]
 

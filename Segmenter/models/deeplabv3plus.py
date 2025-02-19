@@ -1,15 +1,8 @@
-#!/usr/bin/python
-# -*- encoding: utf-8 -*-
-
-
 import torch
 import torch.nn as nn
-import torch.utils.model_zoo as modelzoo
 import torch.nn.functional as F
-import torchvision
 
 from .resnet import Resnet50, Resnet101, Resnet18
-# from modules import InPlaceABNSync as BatchNorm2d
 
 
 

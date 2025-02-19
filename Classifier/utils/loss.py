@@ -98,3 +98,16 @@ class L_holift(nn.Module):
         cam_sum = cam_flatten.sum(1)
         loss = torch.mean(torch.square(cam_sum - 1))
         return loss 
+
+class L_focal_balance(nn.Module):
+    def __init__(self, gamma=2, eps=1e-7):
+        super(L_focal_balance, self).__init__()
+        self.gamma = gamma
+        self.eps = eps
+
+    def forward(self, input, target):
+        input_sig = input.sigmoid().clamp(self.eps, 1. - self.eps)
+        # here add some weight to balance focal loss and other loss
+        loss = -(target * (1 + (1 - input_sig) ** self.gamma) * input_sig.log() + (1 - target) * (1 + input_sig ** self.gamma) * (1 - input_sig).log())
+        ret = loss.mean()
+        return ret

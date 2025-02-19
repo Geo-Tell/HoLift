@@ -42,7 +42,7 @@ def DFC2020_Train(args, use_hr=True, use_mr=True, use_lr=False, use_rgb=True, us
         std_all = np.concatenate((std_s1, std_all))
 
     input_size = int(args.InputSize)
-    if args.model_name == 'vgg':
+    if args.ModelName == 'vgg':
         tsfm_train = transforms.Compose([transforms.Normalize(mean_all, std_all),])
     tsfm_test = transforms.Compose([transforms.Normalize(mean_all, std_all),])
     tsfm_more = [transforms.Compose([
@@ -94,13 +94,13 @@ def read_labeled_image_list(data_dir, data_list, label_list):
     labels = np.load(label_list, allow_pickle=True).item()
     for line in lines:
         image_pair = []
-        image = line.strip().split()
+        image = line.strip()
         image_name_split = image.split('_')
         image_pair.append(os.path.join(data_dir, '_'.join(image_name_split[:2]),'_'.join(image_name_split[2:4]),image))
         image_name_split[2] = 's1'
         image_pair.append(os.path.join(data_dir, '_'.join(image_name_split[:2]),'_'.join(image_name_split[2:4]),'_'.join(image_name_split)))
         img_name_list.append(image_pair)
-        image_name_split[2] = 's1'
+        image_name_split[2] = 'lc'
         label_name = '_'.join(image_name_split)
         lab = labels[label_name[:-4]]
         lab = np.concatenate((lab[1:3],lab[4:8],lab[9:])) # skip Savanna(3) and Snow/Ice(8)

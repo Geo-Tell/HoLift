@@ -16,7 +16,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import torch.nn.functional as F
 from Classifier.utils import AverageMeter
-from Classifier.utils import L_cross, L_holift
+from Classifier.utils import L_cross, L_holift, L_focal_balance
 from Classifier.utils.LoadData_DeepGlobe import DeepGlobe_Train
 from Classifier.utils.LoadData_DFC2020 import DFC2020_Train
 from tqdm import trange, tqdm
@@ -52,6 +52,8 @@ def get_arguments():
     parser.add_argument("--CAMThre", type=float, default=0.7, 
                         help='Threshold of CAM for selecting pixels in L_cross')
     # loss
+    parser.add_argument("--ClsLoss", type=str, default='ce', 
+                        choices=['ce','focal'])
     parser.add_argument("--IntraImg", action='store_true', 
                         help='Use transformed input image as the last reference or not')
     parser.add_argument("--LambdaCross", type=float, default=4.0,
@@ -95,7 +97,7 @@ def get_model(args):
         input_channel = args.InputChannel
         num_classes = 8
     if args.ModelName == 'vgg':
-        model = vgg.VGG_CAM(pretrained=True, num_classes=num_classes, input_channel=input_channel)
+        model = vgg.VGG_CAM(pretrained=(input_channel==3), num_classes=num_classes, input_channel=input_channel)
         model = model.cuda(args.local_rank)
         model = nn.parallel.DistributedDataParallel(model, device_ids=[args.local_rank])#, find_unused_parameters=True)
         param_groups = model.module.get_parameter_groups()
@@ -214,6 +216,10 @@ def train(args):
     wait_epoch_holift = args.WaitEpochHolift
     wait_epoch_cross = args.WaitEpochCross
 
+    if args.ClsLoss == 'focal':
+        l_cls = L_focal_balance().cuda()
+    else:
+        l_cls = nn.CrossEntropyLoss().cuda()
     l_cross = L_cross(cam_thre).cuda()
     l_holift = L_holift().cuda()
 
@@ -242,15 +248,11 @@ def train(args):
 
             if len(logits.shape) == 1:
                 logits = logits.reshape(label1.shape)
-            loss_ce = F.multilabel_soft_margin_loss(logits, label1.clone())
+            loss_ce = l_cls(logits, label1.clone())
 
-            cam2s = []
-            feat2s = []
             losses_cross = []
             for i in range(len(input2s)):
                 _, cam2, feat2 = model(input2s[i])
-                cam2s.append(cam2)
-                feat2s.append(feat2)
                 losses_cross.append(l_cross(cam1, cam2, feat1, feat2, label1.clone(), label2s[i].clone().cuda()))
                 if i == 0:
                     mask_area = l_cross.area()

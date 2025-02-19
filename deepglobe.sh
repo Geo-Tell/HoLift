@@ -12,7 +12,7 @@ python ./Preprocess/DeepGlobe/preprocess.py \
     --SavePath ${DataSavePath}
 
 #### Step 1: Train Classifier (Backbone: VGG)
-CUDA_VISIBLE_DEVICES=4,5,6,7 python -m torch.distributed.launch --nnodes=1 --nproc_per_node=4 --master_port 54321 ./Classifier/scripts/train.py \
+CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nnodes=1 --nproc_per_node=4 --master_port 54321 ./Classifier/scripts/train.py \
     --Dataset ${Dataset} \
     --ModelName vgg \
     --Lr 1e-3 \
@@ -24,9 +24,7 @@ CUDA_VISIBLE_DEVICES=4,5,6,7 python -m torch.distributed.launch --nnodes=1 --npr
     --TrainList ${DataSavePath}/train_list.txt \
     --ValList ${DataSavePath}/val_list.txt \
     --SnapshotDir ${ClassifierSavePath}/model \
-    --IntraImg \
-    --NumWorkers 0 \
-    --DispInterval 1
+    --IntraImg
 
 # # (uncomment this part if you want to train ResNet50)
 # #### Step 1: Train Classifier (Backbone: ResNet50) 
@@ -55,14 +53,14 @@ python ./Classifier/scripts/test.py \
     --RestoreFrom ${ClassifierSavePath}/model/deepglobe_epoch_29.pth \
     --SaveDir ${ClassifierSavePath}
 
-# # (uncomment this part if you want to test ResNet50)
+# # # (uncomment this part if you want to test ResNet50)
 # #### Step 2: Test Classifier (Backbone: ResNet50)
 # python ./scripts/test.py \
+#     --Dataset ${Dataset} \
+#     --ModelName resnet50 \
 #     --ImgDir ${DataSavePath}/img \
 #     --LabelDir ${DataSavePath}/cls_label.npy \
 #     --ValList ${DataSavePath}/train_list.txt \
-#     --ModelName resnet50 \
-#     --Dataset ${Dataset} \
 #     --RestoreFrom ${ClassifierSavePath}/model/deepglobe_epoch_29.pth \
 #     --SaveDir ${ClassifierSavePath} \
 #     --TestAug
@@ -70,7 +68,8 @@ python ./Classifier/scripts/test.py \
 #### Step 3: Evaluate CAM
 python ./Classifier/eval_cam.py \
     --CAMDir ${ClassifierSavePath}/cam \
-    --LabelDir ${DataPath}/lb
+    --LabelDir ${DataSavePath}/lb \
+    --SaveDir ${ClassifierSavePath}/cam_eval.txt
 
 # # (uncomment this part if you want to visualize CAM)
 # #### Step 3.5: Visualize CAM

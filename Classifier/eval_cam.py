@@ -12,6 +12,8 @@ def get_arguments():
                         help='Directory of annotations')
     parser.add_argument("--FgThre", type=float, default=0.5,
                         help='Threshold for foreground')
+    parser.add_argument("--SaveDir", type=str, default='',
+                        help='Path to save results')
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -19,6 +21,10 @@ if __name__ == '__main__':
     width, height = 256, 256
     lb_path = args.LabelDir
     files = os.listdir(args.CAMDir)
+
+    if not os.path.exists(os.path.dirname(args.SaveDir)):
+        os.makedirs(os.path.dirname(args.SaveDir))
+    f_save = open(args.SaveDir, 'w')
 
     recalls = []
     precisions = []
@@ -44,5 +50,8 @@ if __name__ == '__main__':
         else:
             precisions.append(np.sum(TP) / np.sum(cam_mask))
         recalls.append(np.sum(TP) / np.sum(lb_mask))
+    f_save.write('Recall: ' + str(np.mean(recalls)) + '\n')
+    f_save.write('Noise: ' + str(1 - np.mean(precisions)) + '\n')
+    f_save.close()
     print('Recall:', np.mean(recalls))
     print('Noise:', 1 - np.mean(precisions))
