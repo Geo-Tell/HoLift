@@ -80,7 +80,7 @@ def DFC2020_Test(args, use_hr=True, use_mr=True, use_lr=False, use_rgb=True, use
         std_all = np.concatenate((std_s1, std_all))
 
     tsfm_test = transforms.Compose([transforms.Normalize(mean_all, std_all),])
-    img_test = DFC2020_single(args.TrainList, root_dir=args.ImgDir, label_list=args.LabelDir, bands_selected=bands_selected, use_sar=use_sar, transform=tsfm_test)
+    img_test = DFC2020_single(args.ValList, root_dir=args.ImgDir, label_list=args.LabelDir, bands_selected=bands_selected, use_sar=use_sar, transform=tsfm_test)
 
     val_loader = DataLoader(img_test, batch_size=args.BatchSize, shuffle=False, num_workers=args.NumWorkers)
     return val_loader

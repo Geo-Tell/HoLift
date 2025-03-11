@@ -43,7 +43,7 @@ def DeepGlobe_Train(args):
                                             int(2*input_size)]),  
                     transforms_pytorch.RandomHorizontalFlip(0.5),
                     transforms_pytorch.RandomVerticalFlip(0.5),
-                    transforms_pytorch.RandomRotation(0,90),
+                    transforms.RandomRotation([0,90]),
                     transforms.Normalize(mean_vals, std_vals),
                 ])]
 
@@ -65,7 +65,7 @@ def DeepGlobe_Test(args):
                                     transforms.ToTensor(),
                                     transforms.Normalize(mean_vals, std_vals),
                                     ])
-    img_test = DeepGlobe_single(args.TrainList, root_dir=args.ImgDir, 
+    img_test = DeepGlobe_single(args.ValList, root_dir=args.ImgDir, 
                                 label_list=args.LabelDir, transform=tsfm_test, 
                                 test_aug=args.TestAug)
     val_loader = DataLoader(img_test, batch_size=args.BatchSize, shuffle=False, 

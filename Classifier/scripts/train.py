@@ -219,7 +219,7 @@ def train(args):
     if args.ClsLoss == 'focal':
         l_cls = L_focal_balance().cuda()
     else:
-        l_cls = nn.CrossEntropyLoss().cuda()
+        l_cls = nn.MultiLabelSoftMarginLoss().cuda()
     l_cross = L_cross(cam_thre).cuda()
     l_holift = L_holift().cuda()
 

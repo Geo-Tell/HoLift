@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
+sys.path.append(os.getcwd())
 
 import os
 import cv2
@@ -8,10 +8,10 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 import argparse
-from utils.LoadData_DeepGlobe import DeepGlobe_Test
-from utils.LoadData_DFC2020 import DFC2020_Test
-from models import vgg
-from models import resnet50_cam as resnet50
+from Classifier.utils.LoadData_DeepGlobe import DeepGlobe_Test
+from Classifier.utils.LoadData_DFC2020 import DFC2020_Test
+from Classifier.models import vgg
+from Classifier.models import resnet50_cam as resnet50
 from tqdm import tqdm
 from PIL import Image
 
@@ -44,7 +44,7 @@ def get_arguments():
     return parser.parse_args()
 
 def get_model(args):
-    if args.dataset == 'deepglobe':
+    if args.Dataset == 'deepglobe':
         input_channel = 3
         num_classes = 6
     elif args.Dataset == 'dfc2020':
