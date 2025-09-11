@@ -284,7 +284,10 @@ def train(args):
             batch_time.update(time.time() - end)
             end = time.time()
             
-            my_optim.reduce_lr_poly(args.Lr, optimizer, current_iter, max_step, wait_step_holift)
+            if current_epoch >= wait_epoch_cross:
+                my_optim.reduce_lr_poly(args.Lr*2, optimizer, current_iter, max_step, wait_step_holift)
+            else:
+                my_optim.reduce_lr_poly(args.Lr, optimizer, current_iter, max_step, wait_step_holift)
             global_counter = current_epoch * steps_per_epoch + idx + 1
 
             if global_counter % args.DispInterval == 0:
